@@ -1,0 +1,51 @@
+{
+  "name": "ng-github-wiki-gen",
+  "description": "Generates Module, Components and Routes for Github Wiki integration with Angular",
+  "version": "0.0.1",
+  "author": "Samuel Marks @SamuelMarks",
+  "bin": {
+    "ng-github-wiki-gen": "./bin/run"
+  },
+  "bugs": "https://github.com/SamuelMarks/ng-github-wiki-gen/issues",
+  "dependencies": {
+    "@oclif/command": "^1.5.6",
+    "@oclif/config": "^1.9.0",
+    "@oclif/plugin-help": "^2.1.4",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "@angular/core": "^7.1.1",
+    "@angular/router": "^7.1.1",
+    "@oclif/tslint": "^3.1.1",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.12",
+    "github-wiki-to-html": "https://api.github.com/repos/SamuelMarks/github-wiki-to-html/tarball",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.2.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib"
+  ],
+  "homepage": "https://github.com/SamuelMarks/ng-github-wiki-gen",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "bin": "ng-github-wiki-gen"
+  },
+  "repository": "SamuelMarks/ng-github-wiki-gen",
+  "scripts": {
+    "posttest": "tslint -p . -t stylish",
+    "prepack": "rm -rf lib && tsc -b",
+    "test": "echo NO TESTS"
+  },
+  "types": "lib/index.d.ts"
+}
