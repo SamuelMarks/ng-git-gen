@@ -1,7 +1,7 @@
 {
   "name": "ng-github-wiki-gen",
   "description": "Generates Module, Components and Routes for Github Wiki integration with Angular",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Samuel Marks @SamuelMarks",
   "bin": {
     "ng-github-wiki-gen": "./bin/run"
@@ -14,7 +14,7 @@
     "@oclif/command": "^1.5.6",
     "@oclif/config": "^1.9.0",
     "@oclif/plugin-help": "^2.1.4",
-    "github-wiki-to-html": "https://api.github.com/repos/SamuelMarks/github-wiki-to-html/tarball",
+    "isomorphic-git": "^0.44.2",
     "rxjs": "^6.3.3",
     "tslib": "^1.9.3"
   },
