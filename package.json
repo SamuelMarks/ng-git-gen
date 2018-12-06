@@ -8,21 +8,21 @@
   },
   "bugs": "https://github.com/SamuelMarks/ng-github-wiki-gen/issues",
   "dependencies": {
-    "@oclif/command": "^1.5.6",
-    "@oclif/config": "^1.9.0",
-    "@oclif/plugin-help": "^2.1.4",
-    "tslib": "^1.9.3"
-  },
-  "devDependencies": {
     "@angular/common": "^7.1.1",
     "@angular/core": "^7.1.1",
     "@angular/router": "^7.1.1",
+    "@oclif/command": "^1.5.6",
+    "@oclif/config": "^1.9.0",
+    "@oclif/plugin-help": "^2.1.4",
+    "github-wiki-to-html": "https://api.github.com/repos/SamuelMarks/github-wiki-to-html/tarball",
+    "rxjs": "^6.3.3",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
     "@oclif/tslint": "^3.1.1",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.12",
-    "github-wiki-to-html": "https://api.github.com/repos/SamuelMarks/github-wiki-to-html/tarball",
-    "rxjs": "^6.3.3",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.2.1"
