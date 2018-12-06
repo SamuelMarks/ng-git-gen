@@ -7,11 +7,15 @@ Generates Module, Components and Routes for Github Wiki integration with Angular
 
 # Install
 
-    npm i -g https://api.github.com/repos/SamuelMarks/ng-github-wiki-gen/tarball
+    npm i -g ng-github-wiki-gen
 
 # Usage
 
     $ ng-github-wiki-gen --help
+    Generates Module, Components and Routes for Github Wiki integration with Angular.
+    
+    USAGE
+      $ ng-github-wiki-gen
     
     OPTIONS
       -g, --git_url=git_url              (required) Git URL to use markdown from
