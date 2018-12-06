@@ -1,7 +1,7 @@
 {
   "name": "ng-github-wiki-gen",
   "description": "Generates Module, Components and Routes for Github Wiki integration with Angular",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Samuel Marks @SamuelMarks",
   "bin": {
     "ng-github-wiki-gen": "./bin/run"
