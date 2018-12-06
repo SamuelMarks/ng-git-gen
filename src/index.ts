@@ -2,14 +2,17 @@ import { Command, flags } from '@oclif/command';
 
 import * as path from 'path';
 import { existsSync, mkdirSync, WriteFileOptions, writeFileSync } from 'fs';
-
-import { acquireGithubWiki } from 'github-wiki-to-html';
-
 import { Routes } from '@angular/router';
 import { Type } from '@angular/core';
 
 import { camelCaseToDash, ensure_quoted, fnameSanitise } from './utils';
 import { component_gen, module_gen, routes_gen } from './generators';
+
+
+const gw2html = require('github-wiki-to-html');
+const acquireGithubWiki = gw2html.acquireGithubWiki;
+
+// import { acquireGithubWiki } from 'github-wiki-to-html';
 
 class NgGithubWikiGen extends Command {
     static description = 'Generates Module, Components and Routes for Github Wiki integration with Angular.';
@@ -40,7 +43,7 @@ class NgGithubWikiGen extends Command {
 
         if (!existsSync(gen)) mkdirSync(gen); // Should I wipe the directory instead?
         acquireGithubWiki(flags.git_url, void 0,
-            (err, fname2content) => {
+            (err: Error | undefined, fname2content: Map<string, string>) => {
                 if (err != null) throw err;
                 else if (fname2content == null) throw ReferenceError('Empty fname2content');
 

@@ -11,11 +11,7 @@ Generates Module, Components and Routes for Github Wiki integration with Angular
 
 # Usage
 
-    ./bin/run --help
-    Generates Module, Components and Routes for Github Wiki integration with Angular.
-    
-    USAGE
-      $ ng-github-wiki-gen
+    $ ng-github-wiki-gen --help
     
     OPTIONS
       -g, --git_url=git_url              (required) Git URL to use markdown from
