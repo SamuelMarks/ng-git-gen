@@ -8,7 +8,7 @@ import { Routes } from '@angular/router';
 
 import { component_gen, module_gen, routes_gen } from './generators';
 import { acquireGithubWiki } from './git';
-import { camelCaseToDash, ensure_quoted, fnameSanitise } from './utils';
+import { camelCaseToDash, ensure_quoted, fnameSanitise, slugify } from './utils';
 
 
 class NgGithubWikiGen extends Command {
@@ -59,7 +59,7 @@ class NgGithubWikiGen extends Command {
                 declarations.push(class_name);
 
                 routes.push({
-                    path: ensure_quoted(fnameSanitise(fname.slice(0, fname.lastIndexOf('.')))),
+                    path: ensure_quoted(slugify(fnameSanitise(fname.slice(0, fname.lastIndexOf('.'))))),
                     component: class_name as any as Type<any>
                 });
             }

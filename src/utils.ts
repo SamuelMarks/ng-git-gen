@@ -25,3 +25,13 @@ export const ensure_quoted = (s: string, q = '\''): string => s == null || !s.le
 
 // https://gist.github.com/youssman/745578062609e8acac9f#gistcomment-2304728
 export const camelCaseToDash = (s: string): string => s.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
+
+export const slugify = (s: string): string =>
+    s
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-')     // Replace spaces with -
+        .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+        .replace(/\-\-+/g, '-')   // Replace multiple - with single -
+        .replace(/^-+/, '')       // Trim - from start of text
+        .replace(/-+$/, '');

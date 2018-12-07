@@ -9,14 +9,16 @@
   "bugs": "https://github.com/SamuelMarks/ng-git-gen/issues",
   "dependencies": {
     "@angular/common": "^7.1.1",
-    "@angular/core": "^7.1.1",
+    "@angular/core": "^7.1.2",
+    "@angular/platform-browser": "^7.1.2",
     "@angular/router": "^7.1.1",
     "@oclif/command": "^1.5.6",
     "@oclif/config": "^1.9.0",
     "@oclif/plugin-help": "^2.1.4",
     "isomorphic-git": "^0.44.2",
     "rxjs": "^6.3.3",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "zone.js": "^0.8.26"
   },
   "devDependencies": {
     "@oclif/tslint": "^3.1.1",
@@ -36,7 +38,13 @@
   ],
   "homepage": "https://github.com/SamuelMarks/ng-git-gen",
   "keywords": [
-    "oclif", "github", "github-wiki", "wiki", "markdown", "angular", "md"
+    "oclif",
+    "github",
+    "github-wiki",
+    "wiki",
+    "markdown",
+    "angular",
+    "md"
   ],
   "license": "MIT",
   "main": "lib/index.js",
