@@ -21,7 +21,7 @@ class NgGithubWikiGen extends Command {
         ng_project_name: flags.string({ description: 'angular project name, defaults to first in angular.json' }),
         git_url: flags.string({ char: 'g', description: 'Git URL to use markdown from', required: true }),
         list_route: flags.boolean({
-            char: 'l', description: 'Generate root route, listing all wiki links',
+            char: 'l', description: '[default: true] Generate root route, listing all wiki links',
             default: true
         }),
         route: flags.string({ char: 'r', description: 'Route, e.g.: /wiki', default: 'wiki' }),
@@ -38,7 +38,10 @@ class NgGithubWikiGen extends Command {
         const ng_project_name = flags.ng_project_name ? flags.ng_project_name
             : Object.keys(angular_json['projects'])[0];
         const ng_prefix = angular_json['projects'][ng_project_name]['prefix'];
-        const gen = path.join(flags.project_dir, 'src', ng_project_name, flags.route as string, 'generated');
+        const gen = path.join(
+            flags.project_dir, angular_json['projects'][ng_project_name]['sourceRoot'],
+            ng_prefix, flags.route as string, 'generated'
+        );
 
         if (!existsSync(gen)) mkdirSync(gen); // Should I wipe the directory instead?
         acquireGithubWiki(flags.ext as string, flags.git_url, void 0, (err, fname2content) => {
