@@ -1,21 +1,23 @@
-ng-github-wiki-gen
+ng-git-gen
 ==================
 
-Generates Module, Components and Routes for Github Wiki integration with Angular.
+Generates Module, Components and Routes from a git repository's markdown files for Angular.
+
+Originally for Github Wiki integration.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 
 # Install
 
-    npm i -g ng-github-wiki-gen
+    npm i -g ng-git-gen
 
 # Usage
 
-    $ ng-github-wiki-gen --help
+    $ ng-git-gen --help
     Generates Module, Components and Routes for Github Wiki integration with Angular.
     
     USAGE
-      $ ng-github-wiki-gen
+      $ ng-git-gen
     
     OPTIONS
       -g, --git_url=git_url              (required) Git URL to use markdown from

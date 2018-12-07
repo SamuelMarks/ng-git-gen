@@ -1,13 +1,15 @@
 import { Command, flags } from '@oclif/command';
 
-import * as path from 'path';
 import { existsSync, mkdirSync, WriteFileOptions, writeFileSync } from 'fs';
-import { Routes } from '@angular/router';
-import { Type } from '@angular/core';
+import * as path from 'path';
 
-import { camelCaseToDash, ensure_quoted, fnameSanitise } from './utils';
+import { Type } from '@angular/core';
+import { Routes } from '@angular/router';
+
 import { component_gen, module_gen, routes_gen } from './generators';
 import { acquireGithubWiki } from './git';
+import { camelCaseToDash, ensure_quoted, fnameSanitise } from './utils';
+
 
 class NgGithubWikiGen extends Command {
     static description = 'Generates Module, Components and Routes for Github Wiki integration with Angular.';
@@ -22,22 +24,24 @@ class NgGithubWikiGen extends Command {
             char: 'l', description: 'Generate root route, listing all wiki links',
             default: true
         }),
+        route: flags.string({ char: 'r', description: 'Route, e.g.: /wiki', default: 'wiki' }),
+        ext: flags.string({ char: 'e', description: 'Extension, e.g.: \'.md\'', default: '.md' }),
     };
 
     async run() {
         /* tslint:disable:no-shadowed-variable */
         const { args, flags } = this.parse(NgGithubWikiGen);
 
-        const gen = path.join(flags.project_dir, 'src', 'app', 'wiki', 'generated');
         const write_options: WriteFileOptions = { encoding: 'utf8', flag: 'w' };
 
         const angular_json = require(path.join(flags.project_dir, 'angular.json'));
         const ng_project_name = flags.ng_project_name ? flags.ng_project_name
             : Object.keys(angular_json['projects'])[0];
         const ng_prefix = angular_json['projects'][ng_project_name]['prefix'];
+        const gen = path.join(flags.project_dir, 'src', ng_project_name, flags.route as string, 'generated');
 
         if (!existsSync(gen)) mkdirSync(gen); // Should I wipe the directory instead?
-        acquireGithubWiki(flags.git_url, void 0, (err, fname2content) => {
+        acquireGithubWiki(flags.ext as string, flags.git_url, void 0, (err, fname2content) => {
             if (err != null) throw err;
             else if (fname2content == null) throw ReferenceError('Empty fname2content');
 
@@ -96,4 +100,4 @@ class NgGithubWikiGen extends Command {
     }
 }
 
-export = NgGithubWikiGen
+export = NgGithubWikiGen;
