@@ -14,12 +14,9 @@ Originally for Github Wiki integration.
 # Usage
 
     $ ng-git-gen --help
-    Generates Module, Components and Routes for Github Wiki integration with Angular.
-    
-    USAGE
-      $ ng-git-gen
     
     OPTIONS
+      -b, --bootstrap=bootstrap          Execute this before collecting files with extension
       -e, --ext=ext                      [default: .md] Extension, e.g.: '.md'
       -g, --git_url=git_url              (required) Git URL to use markdown from
       -h, --help                         show CLI help
@@ -31,7 +28,7 @@ Originally for Github Wiki integration.
 
 Now, let's show how to use this in a project.
 
-    $ ng new foo
+    $ ng new foo --routing --interactive=false
     $ cd foo
     $ mkdir src/app/wiki
     $ ng-git-gen -p "$PWD" -g 'https://github.com/Fantom-foundation/fantom-dev-web.wiki.git' -l

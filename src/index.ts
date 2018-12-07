@@ -26,6 +26,7 @@ class NgGithubWikiGen extends Command {
         }),
         route: flags.string({ char: 'r', description: 'Route, e.g.: /wiki', default: 'wiki' }),
         ext: flags.string({ char: 'e', description: 'Extension, e.g.: \'.md\'', default: '.md' }),
+        bootstrap: flags.string({ char: 'b', description: 'Execute this before collecting files with extension' })
     };
 
     async run() {
@@ -44,7 +45,7 @@ class NgGithubWikiGen extends Command {
         );
 
         if (!existsSync(gen)) mkdirSync(gen); // Should I wipe the directory instead?
-        acquireGithubWiki(flags.ext as string, flags.git_url, void 0, (err, fname2content) => {
+        acquireGithubWiki(flags.ext as string, flags.git_url, void 0, flags.bootstrap, (err, fname2content) => {
             if (err != null) throw err;
             else if (fname2content == null) throw ReferenceError('Empty fname2content');
 
