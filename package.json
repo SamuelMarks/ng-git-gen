@@ -1,7 +1,7 @@
 {
   "name": "ng-git-gen",
   "description": "Generates Module, Components and Routes for Github Wiki integration with Angular",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Samuel Marks @SamuelMarks",
   "bin": {
     "ng-git-gen": "./bin/run"
