@@ -38,3 +38,7 @@ This will populate `src/app/wiki/generated`. Next, you can include this in your 
 ```typescript
 const routes: Routes = [{ path: 'wiki', loadChildren: './wiki/generated/generated.module#GeneratedModule' }];
 ```
+
+# Extracting body from HTML
+
+    hxnormalize -xe foo.html | hxselect -cs '\n' 'body'

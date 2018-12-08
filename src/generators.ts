@@ -14,6 +14,19 @@ export const component_gen = (prefix: string, name: string, template: string,
 export class ${className} {}
 `;
 
+export const component_gen_tpl_url = (prefix: string, name: string, templateUrl: string,
+                                      styles: string[] | undefined, className: string): string =>
+    `import { Component } from '@angular/core';
+
+
+@Component({
+  selector: ${ensure_quoted(prefix + '-' + name)},
+  templateUrl: ${ensure_quoted(templateUrl, '`')},
+  styles: [${styles == null || !styles.length ? '' : styles.map(s => ensure_quoted(s)).join(', ')}]
+})
+export class ${className} {}
+`;
+
 export const module_gen = (imports: string[], declarations: string[], className: string): string =>
     `import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
