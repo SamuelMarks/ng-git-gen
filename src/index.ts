@@ -7,7 +7,7 @@ import { Type } from '@angular/core';
 import { Routes } from '@angular/router';
 
 import { component_gen, component_gen_tpl_url, module_gen, routes_gen } from './generators';
-import { acquireGithubWiki } from './git';
+import { acquireGithubWiki, Fname2Content } from './git';
 import { camelCaseToDash, ensure_quoted, fnameSanitise, slugify } from './utils';
 
 class NgGithubWikiGen extends Command {
@@ -53,30 +53,40 @@ class NgGithubWikiGen extends Command {
         else if (!existsSync(gen_par)) mkdirSync(gen_par);
         mkdirSync(gen);
         acquireGithubWiki(flags.ext as string, flags.git_url, void 0, flags.bootstrap)
-            .then(fname2content => {
-                if (fname2content == null) throw ReferenceError('Empty fname2content');
-
-                console.info('fname2content:', fname2content, ';');
-
+            .then((fname2content: Fname2Content) => {
+                if (!fname2content.size) {
+                    console.warn(
+                        'Empty fname2content... will still generate' +
+                        `${flags.list_route ? ' list Component and' : ''} Module`);
+                    return;
+                }
                 const routes: Routes = [];
                 const declarations: string[] = [];
-                for (const [fname, content] of fname2content.entries()) {
-                    const _path = fnameSanitise(fname.slice(0, fname.lastIndexOf('.')));
-                    const cname = _path.replace('/', '-');
 
-                    const class_name = `${cname[0].toUpperCase() + cname.slice(1).replace(/-([a-z])/g,
-                        (x, up) => up.toUpperCase())}`
-                        + 'Component';
-                    const tpl_fname = `${cname}.component.html`;
-                    writeFileSync(path.join(gen, `${cname}.component.ts`),
-                        component_gen_tpl_url(ng_prefix, cname, `./${tpl_fname}`, void 0, class_name), write_options);
-                    writeFileSync(path.join(gen, tpl_fname), content, write_options);
-                    declarations.push(class_name);
+                try {
+                    for (const [fname, content] of fname2content.entries()) {
+                        const _path = fnameSanitise(fname.slice(0, fname.lastIndexOf('.')));
+                        const cname = _path.replace('/', '-');
 
-                    routes.push({
-                        path: ensure_quoted(slugify(fnameSanitise(fname.slice(0, fname.lastIndexOf('.'))))),
-                        component: class_name as any as Type<any>
-                    });
+                        const class_name = `${cname[0].toUpperCase() + cname.slice(1).replace(/-([a-z])/g,
+                            (x, up) => up.toUpperCase())}`
+                            + 'Component';
+                        const tpl_fname = `${cname}.component.html`;
+                        writeFileSync(path.join(gen, `${cname}.component.ts`),
+                            component_gen_tpl_url(ng_prefix, cname, `./${tpl_fname}`,
+                                void 0, class_name), write_options);
+                        writeFileSync(path.join(gen, tpl_fname), content, write_options);
+                        declarations.push(class_name);
+
+                        routes.push({
+                            path: ensure_quoted(slugify(fnameSanitise(fname.slice(0, fname.lastIndexOf('.'))))),
+                            component: class_name as any as Type<any>
+                        });
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    process.exit(2);
+                    return;
                 }
 
                 const className = 'ListComponent';
@@ -112,7 +122,7 @@ class NgGithubWikiGen extends Command {
                     ),
                     write_options);
             })
-            .catch(e => {
+            .catch((e: Error) => {
                 throw e;
             });
     }

@@ -21,7 +21,7 @@ export const component_gen_tpl_url = (prefix: string, name: string, templateUrl:
 
 @Component({
   selector: ${ensure_quoted(prefix + '-' + name)},
-  templateUrl: ${ensure_quoted(templateUrl, '`')},
+  templateUrl: ${ensure_quoted(templateUrl)},
   styles: [${styles == null || !styles.length ? '' : styles.map(s => ensure_quoted(s)).join(', ')}]
 })
 export class ${className} {}

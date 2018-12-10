@@ -4,6 +4,7 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 
 import * as git from 'isomorphic-git';
+import { walkSync } from './utils';
 
 git.plugins.set('fs', fs);
 
@@ -22,20 +23,27 @@ export const acquireGithubWiki = (ext: string, url: string, to_dir: string | und
                 depth: 10
             })
             .then(() => new Promise((res, rej) =>
-                bootstrap == null || !bootstrap.length ? resolve() :
+                bootstrap == null || !bootstrap.length ? res() :
                     exec(bootstrap as string, { cwd: dir }, (err, stdout, stderr) =>
                         err == null
                             ? process.stdout.write(stdout) && process.stderr.write(stderr) && res()
                             : rej(err)))
-                .then(() => git
-                    .listFiles({ fs, dir })
-                    .then((files: string[]) => resolve(
-                        new Map<string, string>(files
-                            .filter((fname: string) => fname.endsWith(ext) && !fname.startsWith(`.github${path.sep}`))
-                            .map((fname: string) => [
-                                fname, fs.readFileSync(path.join(dir, fname), { encoding: 'utf8' })
-                            ]) as any
-                        ))
-                    )
-                    .catch(reject))));
+                .then(() => {
+                    const fname2content: Fname2Content = new Map();
+                    try {
+                        for (const fname of walkSync(dir))
+                            if (fname.endsWith(ext)
+                                && fname.indexOf(`${path.sep}.github${path.sep}`) === -1
+                                && fname.indexOf(`${path.sep}.git${path.sep}`) === -1)
+                                fname2content.set(fname.replace(`${dir}${path.sep}`, ''),
+                                    fs.readFileSync(fname, { encoding: 'utf8' }));
+                    } catch (e) {
+                        reject(e);
+                    }
+                    return resolve(fname2content);
+                })
+                .catch(reject)
+            )
+            .catch(reject)
+    );
 };

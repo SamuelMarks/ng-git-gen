@@ -1,3 +1,4 @@
+import { readdirSync, statSync } from 'fs';
 import * as path from 'path';
 
 export const fnameSanitise = (fname: string): string =>
@@ -35,3 +36,16 @@ export const slugify = (s: string): string =>
         .replace(/\-\-+/g, '-')   // Replace multiple - with single -
         .replace(/^-+/, '')       // Trim - from start of text
         .replace(/-+$/, '');
+
+export function* walkSync(dir: string): IterableIterator<string> {
+    const files = readdirSync(dir);
+
+    for (const file of files) {
+        const pathToFile = path.join(dir, file);
+        const isDirectory = statSync(pathToFile).isDirectory();
+        if (isDirectory)
+            yield* walkSync(pathToFile);
+        else
+            yield pathToFile;
+    }
+}
