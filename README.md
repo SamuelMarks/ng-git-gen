@@ -1,5 +1,5 @@
 ng-git-gen
-==================
+==========
 
 Generates Angular (Module, Components and Routes) from static files in a git repo.
 
@@ -7,11 +7,11 @@ Originally for Github Wiki integration.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 
-# Install
+## Install
 
     npm i -g ng-git-gen
 
-# Usage
+## Usage
 
     $ ng-git-gen --help
     
@@ -36,9 +36,19 @@ Now, let's show how to use this in a project.
 This will populate `src/app/wiki/generated`. Next, you can include this in your `src/app/app-routing.module.ts`:
 
 ```typescript
+import { Routes } from '@angular/router';
+
 const routes: Routes = [{ path: 'wiki', loadChildren: './wiki/generated/generated.module#GeneratedModule' }];
 ```
 
-# Extracting body from HTML
+## Examples
 
-    hxnormalize -xe foo.html | hxselect -cs '\n' 'body'
+### Github wiki generation
+```bash
+ ng-git-gen -p "$PWD" -g 'https://github.com/Fantom-foundation/fantom-dev-web.wiki.git' -l
+```
+
+### RFC generation
+```bash
+ng-git-gen -p "$PWD" -g 'https://github.com/Fantom-foundation/fantom-rfcs' -l -b 'make html_body' -e '.html' -i "import { NgxPageScrollModule } from 'ngx-page-scroll';" -f '.replace(/href="#/g, `pageScroll href="#`)' -r rfc
+```

@@ -27,18 +27,23 @@ export const component_gen_tpl_url = (prefix: string, name: string, templateUrl:
 export class ${className} {}
 `;
 
-export const module_gen = (imports: string[], declarations: string[], className: string): string =>
-    `import { NgModule } from '@angular/core';
+const get_import_from_str = (extra_imports: string[]): string => extra_imports.length ?
+    `,\n    ${extra_imports.map(l => l.slice(l.indexOf('{') + 1, l.lastIndexOf('}')).trim()).join(',')}` : '';
+
+export const module_gen =
+    (imports: string[], extra_imports: string[], declarations: string[], className: string): string =>
+        `import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+${extra_imports.join('\\n')}
 ${imports.join('\n')}
 import { generatedRoutes } from './generated.routes';
 
 @NgModule({
   declarations: [${declarations.join(', ')}],
   imports: [
-    CommonModule, RouterModule, RouterModule.forChild(generatedRoutes)
+    CommonModule, RouterModule, RouterModule.forChild(generatedRoutes)${get_import_from_str(extra_imports)}
   ]
 })
 export class ${className} {}

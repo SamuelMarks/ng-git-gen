@@ -1,6 +1,7 @@
 import { Command, flags } from '@oclif/command';
 
 import { existsSync, mkdirSync, readdirSync, rmdirSync, unlinkSync, WriteFileOptions, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
 import * as path from 'path';
 
 import { Type } from '@angular/core';
@@ -8,17 +9,18 @@ import { Routes } from '@angular/router';
 
 import { component_gen, component_gen_tpl_url, module_gen, routes_gen } from './generators';
 import { acquireGithubWiki, Fname2Content } from './git';
-import { camelCaseToDash, ensure_quoted, fnameSanitise, slugify } from './utils';
+import { camelCaseToDash, ensure_quoted, fnameSanitise, log_if_verbose, slugify } from './utils';
 
 class NgGithubWikiGen extends Command {
     static description = 'Generates Module, Components and Routes for Github Wiki integration with Angular.';
 
     static flags = {
-        version: flags.version({ char: 'v' }),
+        version: flags.version(),
         help: flags.help({ char: 'h' }),
         project_dir: flags.string({ char: 'p', description: 'angular project dir', required: true }),
         ng_project_name: flags.string({ description: 'angular project name, defaults to first in angular.json' }),
         git_url: flags.string({ char: 'g', description: 'Git URL to use markdown from', required: true }),
+        git_dir: flags.string({ char: 'd', description: '[default: tmp] Directory to clone git repo into' }),
         list_route: flags.boolean({
             char: 'l', description: '[default: true] Generate root route, listing all wiki links',
             default: true
@@ -26,12 +28,24 @@ class NgGithubWikiGen extends Command {
         route: flags.string({ char: 'r', description: 'Route, e.g.: /wiki', default: 'wiki' }),
         ext: flags.string({ char: 'e', description: 'Extension, e.g.: \'.md\'', default: '.md' }),
         bootstrap: flags.string({ char: 'b', description: 'Execute this before collecting files with extension' }),
-        afterstrap: flags.string({ char: 'a', description: 'Execute this on the content strings' })
+        afterstrap: flags.string({ char: 'a', description: 'Execute this on the content strings' }),
+        verbosity: flags.string({ char: 'v', description: 'verbosity', multiple: true }),
+        extra_imports: flags.string({
+            char: 'i', multiple: true,
+            description: 'Example: \'import {Foo} from bar;\' will add this line, and `Foo` to `imports: []` in Module'
+        }),
+        postprocess_content: flags.string({
+            char: 'f',
+            description: 'Function to run on content before conclusion, e.g.: replace("fo", "ba").replace("ca","ha"})'
+        })
     };
 
     async run() {
         /* tslint:disable:no-shadowed-variable */
         const { args, flags } = this.parse(NgGithubWikiGen);
+
+        const verbosity = flags.verbosity == null ? 0 : flags.verbosity.length;
+        const maybe_log = log_if_verbose(this.log.bind(this), verbosity);
 
         const write_options: WriteFileOptions = { encoding: 'utf8', flag: 'w' };
 
@@ -47,15 +61,19 @@ class NgGithubWikiGen extends Command {
             ng_prefix, flags.route as string, 'generated'
         );
 
+        flags.git_dir = flags.git_dir || path.join(tmpdir(), flags.git_url.slice(flags.git_url.lastIndexOf('/') + 1));
+        maybe_log(flags.git_dir, 'Cloning to:\t');
+
         /* tslint:disable:no-unused-expression */
-        if (existsSync(gen))
-            readdirSync(gen).forEach(fname => unlinkSync(path.join(gen, fname))) as any || rmdirSync(gen);
+        if (existsSync(maybe_log(gen, 'Removing:\t')))
+            readdirSync(gen)
+                .forEach(fname => unlinkSync(path.join(gen, fname))) as any || rmdirSync(gen);
         else if (!existsSync(gen_par)) mkdirSync(gen_par);
         mkdirSync(gen);
-        acquireGithubWiki(flags.ext as string, flags.git_url, void 0, flags.bootstrap)
+        acquireGithubWiki(flags.ext as string, flags.git_url, flags.git_dir, flags.bootstrap)
             .then((fname2content: Fname2Content) => {
                 if (!fname2content.size) {
-                    console.warn(
+                    this.warn(
                         'Empty fname2content... will still generate' +
                         `${flags.list_route ? ' list Component and' : ''} Module`);
                     return;
@@ -72,10 +90,12 @@ class NgGithubWikiGen extends Command {
                             (x, up) => up.toUpperCase())}`
                             + 'Component';
                         const tpl_fname = `${cname}.component.html`;
-                        writeFileSync(path.join(gen, `${cname}.component.ts`),
+                        writeFileSync(maybe_log(path.join(gen, `${cname}.component.ts`)),
                             component_gen_tpl_url(ng_prefix, cname, `./${tpl_fname}`,
                                 void 0, class_name), write_options);
-                        writeFileSync(path.join(gen, tpl_fname), content, write_options);
+                        const processed_content = flags.postprocess_content == null ? content
+                            : Function(`return \`${content}\`${flags.postprocess_content}`)();
+                        writeFileSync(maybe_log(path.join(gen, tpl_fname)), processed_content, write_options);
                         declarations.push(class_name);
 
                         routes.push({
@@ -84,7 +104,7 @@ class NgGithubWikiGen extends Command {
                         });
                     }
                 } catch (e) {
-                    console.error(e.stack);
+                    this.error(e, { exit: 2 });
                     process.exit(2);
                     return;
                 }
@@ -111,13 +131,13 @@ class NgGithubWikiGen extends Command {
                     s => `import { ${s} } from './${camelCaseToDash(s).replace('-component', '.component')}';`
                 );
 
-                writeFileSync(path.join(gen, 'generated.routes.ts'),
+                writeFileSync(maybe_log(path.join(gen, 'generated.routes.ts')),
                     routes_gen(component_imports, routes, 'generatedRoutes'),
                     write_options);
 
-                writeFileSync(path.join(gen, 'generated.module.ts'),
+                writeFileSync(maybe_log(path.join(gen, 'generated.module.ts')),
                     module_gen(
-                        component_imports,
+                        component_imports, flags.extra_imports || [],
                         declarations, 'GeneratedModule'
                     ),
                     write_options);

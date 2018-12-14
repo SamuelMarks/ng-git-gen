@@ -1,5 +1,7 @@
+import { Command } from '@oclif/command';
 import { readdirSync, statSync } from 'fs';
 import * as path from 'path';
+
 
 export const fnameSanitise = (fname: string): string =>
     fname
@@ -49,3 +51,7 @@ export function* walkSync(dir: string): IterableIterator<string> {
             yield pathToFile;
     }
 }
+
+export const log_if_verbose = (debug: Command['debug'], verbosity: number) =>
+    (content: any, msg = 'Generated:\t', gt_level = 0): typeof content =>
+        verbosity > gt_level && debug(`${msg} ${content}`) || content;

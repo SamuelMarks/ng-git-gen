@@ -10,13 +10,12 @@ git.plugins.set('fs', fs);
 
 export type Fname2Content = Map<string, string>;
 
-export const acquireGithubWiki = (ext: string, url: string, to_dir: string | undefined,
+export const acquireGithubWiki = (ext: string, url: string, to_dir: string,
                                   bootstrap: string | undefined): Promise<Fname2Content> => {
-    const dir: string = to_dir || path.join(tmpdir(), url.slice(url.lastIndexOf('/') + 1));
     return new Promise((resolve, reject) =>
         git
             .clone({
-                dir, url,
+                dir: to_dir, url,
                 corsProxy: 'https://cors.isomorphic-git.org',
                 ref: 'master',
                 singleBranch: true,
@@ -24,18 +23,18 @@ export const acquireGithubWiki = (ext: string, url: string, to_dir: string | und
             })
             .then(() => new Promise((res, rej) =>
                 bootstrap == null || !bootstrap.length ? res() :
-                    exec(bootstrap as string, { cwd: dir }, (err, stdout, stderr) =>
+                    exec(bootstrap as string, { cwd: to_dir }, (err, stdout, stderr) =>
                         err == null
                             ? process.stdout.write(stdout) && process.stderr.write(stderr) && res()
                             : rej(err)))
                 .then(() => {
                     const fname2content: Fname2Content = new Map();
                     try {
-                        for (const fname of walkSync(dir))
+                        for (const fname of walkSync(to_dir))
                             if (fname.endsWith(ext)
                                 && fname.indexOf(`${path.sep}.github${path.sep}`) === -1
                                 && fname.indexOf(`${path.sep}.git${path.sep}`) === -1)
-                                fname2content.set(fname.replace(`${dir}${path.sep}`, ''),
+                                fname2content.set(fname.replace(`${to_dir}${path.sep}`, ''),
                                     fs.readFileSync(fname, { encoding: 'utf8' }));
                     } catch (e) {
                         reject(e);
