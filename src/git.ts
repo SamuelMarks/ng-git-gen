@@ -4,11 +4,13 @@ import { WriteFileOptions, writeFileSync } from 'fs';
 import * as path from 'path';
 
 import * as git from 'isomorphic-git';
-import { camelCaseToDash, ensure_quoted, fnameSanitise, slugify, walkSync } from './utils';
-import { Routes } from '@angular/router';
-import { component_gen, component_gen_tpl_url, module_gen, routes_gen } from './generators';
+
 import { Type } from '@angular/core';
+import { Routes } from '@angular/router';
 import { OutputFlags } from '@oclif/parser';
+
+import { component_gen, component_gen_tpl_url, module_gen, routes_gen } from './generators';
+import { camelCaseToDash, ensure_quoted, fnameSanitise, slugify, walkSync } from './utils';
 
 git.plugins.set('fs', fs);
 
@@ -54,7 +56,7 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
 
 export const ngGitProcessor = (flags: OutputFlags<any>,
                                maybe_log: (content: any, msg?: string, level?: number) => typeof content,
-                               gen: string, ng_prefix: string) =>
+                               gen: string, ng_prefix: string, output_ext: string) =>
     (fname2content: Fname2Content): Promise<void> => new Promise((resolve, reject) => {
         const write_options: WriteFileOptions = { encoding: 'utf8', flag: 'w' };
 
@@ -74,10 +76,13 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                 const class_name = `${cname[0].toUpperCase() + cname.slice(1).replace(/-([a-z])/g,
                     (x, up) => up.toUpperCase())}`
                     + 'Component';
-                const tpl_fname = `${cname}.component.html`;
+                const tpl_fname = `${cname}.component${output_ext}`;
+                const componentHeader = `// templateUrl: './${tpl_fname}'`;
                 writeFileSync(maybe_log(path.join(gen, `${cname}.component.ts`)),
-                    component_gen_tpl_url(ng_prefix, cname, `./${tpl_fname}`,
-                        void 0, class_name), write_options);
+                    component_gen_tpl_url(componentHeader, ng_prefix, cname,
+                        `./${tpl_fname.replace(output_ext, '.html')}`,
+                        void 0, class_name),
+                    write_options);
                 const processed_content = flags.postprocess_content == null ? content
                     : Function(`return \`${content}\`${flags.postprocess_content}`)();
                 writeFileSync(maybe_log(path.join(gen, tpl_fname)), processed_content, write_options);
@@ -105,8 +110,9 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
             '</ul>';
 
         try {
-            writeFileSync(path.join(gen, `${name}.component.ts`), component_gen(ng_prefix, name, template,
-                void 0, className), write_options);
+            writeFileSync(path.join(gen, `${name}.component.ts`),
+                component_gen(ng_prefix, name, template, void 0, className),
+                write_options);
             declarations.push(className);
 
             routes.push({

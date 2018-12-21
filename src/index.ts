@@ -3,9 +3,10 @@ import { Command, flags } from '@oclif/command';
 import { existsSync, mkdirSync, readdirSync, rmdirSync, unlinkSync } from 'fs';
 import { tmpdir } from 'os';
 import * as path from 'path';
+
+import { updateGlobalRoutes } from './angular';
 import { acquireGitRepo, ngGitProcessor } from './git';
 import { log_if_verbose } from './utils';
-import { updateGlobalRoutes } from './angular';
 
 class NgGithubWikiGen extends Command {
     static description = 'Generates Module, Components and Routes for Github Wiki integration with Angular.';
@@ -30,6 +31,7 @@ class NgGithubWikiGen extends Command {
         }),
         route: flags.string({ char: 'r', description: 'Route, e.g.: /wiki', default: 'wiki' }),
         ext: flags.string({ char: 'e', description: 'Extension, e.g.: \'.md\'', default: '.md' }),
+        output_ext: flags.string({ char: 'o', description: 'Output extension', default: '.html' }),
         bootstrap: flags.string({ char: 'b', description: 'Execute this before collecting files with extension' }),
         afterstrap: flags.string({ char: 'a', description: 'Execute this on the content strings' }),
         verbosity: flags.string({ char: 'v', description: 'verbosity', multiple: true }),
@@ -71,7 +73,7 @@ class NgGithubWikiGen extends Command {
         mkdirSync(gen);
 
         acquireGitRepo(flags.ext as string, flags.git_url, flags.git_dir, flags.bootstrap)
-            .then(ngGitProcessor(flags, maybe_log, gen, ng_prefix))
+            .then(ngGitProcessor(flags, maybe_log, gen, ng_prefix, flags.output_ext as string))
             .then(() => updateGlobalRoutes(gen_grandparent, flags.global_route,
                 flags.global_route_mount as any || flags.route))
             .catch((e: Error) => {

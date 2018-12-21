@@ -14,11 +14,11 @@ export const component_gen = (prefix: string, name: string, template: string,
 export class ${className} {}
 `;
 
-export const component_gen_tpl_url = (prefix: string, name: string, templateUrl: string,
+export const component_gen_tpl_url = (componentHeader: string, prefix: string, name: string, templateUrl: string,
                                       styles: string[] | undefined, className: string): string =>
     `import { Component } from '@angular/core';
 
-
+${componentHeader}
 @Component({
   selector: ${ensure_quoted(prefix + '-' + name)},
   templateUrl: ${ensure_quoted(templateUrl)},
