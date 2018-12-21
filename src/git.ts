@@ -83,6 +83,8 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                         `./${tpl_fname.replace(output_ext, '.html')}`,
                         void 0, class_name),
                     write_options);
+
+                /* tslint:disable:function-constructor */
                 const processed_content = flags.postprocess_content == null ? content
                     : Function(`return \`${content}\`${flags.postprocess_content}`)();
                 writeFileSync(maybe_log(path.join(gen, tpl_fname)), processed_content, write_options);
@@ -94,6 +96,7 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                 });
             }
         } catch (e) {
+            /* tslint:disable:no-console */
             console.error(e.message, e.stack);
             // process.exit(2);
             return reject(e);
@@ -121,7 +124,8 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
             });
 
             const component_imports = declarations.map(
-                s => `import { ${s} } from './${camelCaseToDash(s).replace('-component', '.component')}';`
+                s => `import { ${s} } from './${camelCaseToDash(s).split('').reverse().join('')
+                    .replace('tnenopmoc-', 'tnenopmoc.').split('').reverse().join('')}';`
             );
 
             writeFileSync(maybe_log(path.join(gen, 'generated.routes.ts')),
