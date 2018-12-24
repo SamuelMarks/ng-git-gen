@@ -2,8 +2,10 @@ import { Command } from '@oclif/command';
 
 import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import * as http from 'http';
+import { ClientRequestArgs } from 'http';
 import * as https from 'https';
 import * as path from 'path';
+import { parse } from 'url';
 
 export const fnameSanitise = (fname: string): string =>
     fname
@@ -73,22 +75,18 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
             return reject(e);
         }
 
-        (url.startsWith('https') ? https : http)
-            .get(url, res => {
-                const { statusCode } = res;
-                const contentType = res.headers['content-type'] as string;
+        const options: ClientRequestArgs = parse(url);
+        options.headers = {
+            'User-Agent': 'request'
+        };
 
-                let error: Error | undefined;
+        (url.startsWith('https') ? https : http)
+            .get(options, res => {
+                const { statusCode } = res;
                 if (statusCode !== 200) {
-                    error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
-                } else if (!/^application\/json/.test(contentType)) {
-                    error = new Error('Invalid content-type.\n' +
-                        `Expected application/json but received ${contentType}`);
-                }
-                if (error) {
                     // consume response data to free up memory
                     res.resume();
-                    return reject(error);
+                    return reject(new Error(`Request Failed.\nStatus Code: ${statusCode}`));
                 }
 
                 const encoding = 'utf8';
