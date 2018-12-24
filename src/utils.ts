@@ -64,8 +64,7 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
         const fname = url.slice(url.lastIndexOf('/') + 1);
         const full_path = path.join(gen_dir, fname);
 
-        console.info('fname:', fname, ';');
-        console.info('full_path:', full_path, ';');
+        console.info('fname:', fname, ';\nfull_path:', full_path, ';\nurl:', url, ';');
 
         try {
             if (existsSync(full_path)) // Sync variants, which aren't deprecated as opposed to `exists`

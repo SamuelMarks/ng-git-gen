@@ -9,6 +9,8 @@ import { Type } from '@angular/core';
 import { Routes } from '@angular/router';
 import { OutputFlags } from '@oclif/parser';
 
+import * as async_ from 'async';
+
 import { component_gen, component_gen_tpl_url_styles_url, module_gen, routes_gen } from './generators';
 import { camelCaseToDash, downloadAndRef, ensure_quoted, fnameSanitise, slugify, walkSync } from './utils';
 
@@ -146,17 +148,23 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                 }
             });
 
-            if (styleUrls != null && styleUrls.length) {
-                for (let i = 0; i < styleUrls.length; i++)
-                    downloadAndRef(gen_dir, styleUrls[i])
-                        .then(styleUrl => styleUrls[i] = styleUrl)
-                        .catch(reject);
-            }
-
-            generateModuleAndComponents()
+            const fin = () => generateModuleAndComponents()
                 .then(() => generateListComponent()
                     .then(() => resolve())
                     .catch(reject))
                 .catch(reject);
+            if (styleUrls != null && styleUrls.length) {
+                async_.forEachOf(styleUrls, (_, i, callback) => {
+                    downloadAndRef(gen_dir, styleUrls[i as number])
+                        .then(styleUrl => {
+                            styleUrls[i as number] = styleUrl;
+                            return callback();
+                        })
+                        .catch(callback);
+                }, error => {
+                    if (error == null) return fin();
+                    return reject(error);
+                });
+            } else fin();
         }
     );
