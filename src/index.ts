@@ -42,6 +42,10 @@ class NgGithubWikiGen extends Command {
         postprocess_content: flags.string({
             char: 'f',
             description: 'Function to run on content before conclusion, e.g.: replace("fo", "ba").replace("ca","ha"})'
+        }),
+        styleUrls: flags.string({
+            char: 's', multiple: true,
+            description: 'styleUrls, if starts with http, then will download to generated dir & update styleUrl to this'
         })
     };
 
@@ -73,7 +77,7 @@ class NgGithubWikiGen extends Command {
         mkdirSync(gen);
 
         acquireGitRepo(flags.ext as string, flags.git_url, flags.git_dir, flags.bootstrap)
-            .then(ngGitProcessor(flags, maybe_log, gen, ng_prefix, flags.output_ext as string))
+            .then(ngGitProcessor(flags, maybe_log, gen, ng_prefix, flags.output_ext as string, flags.styleUrls))
             .then(() => updateGlobalRoutes(gen_grandparent, flags.global_route,
                 flags.global_route_mount as any || flags.route))
             .catch((e: Error) => {

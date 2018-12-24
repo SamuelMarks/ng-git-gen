@@ -1,7 +1,9 @@
 import { Command } from '@oclif/command';
-import { readdirSync, statSync } from 'fs';
-import * as path from 'path';
 
+import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'fs';
+import * as http from 'http';
+import * as https from 'https';
+import * as path from 'path';
 
 export const fnameSanitise = (fname: string): string =>
     fname
@@ -55,3 +57,46 @@ export function* walkSync(dir: string): IterableIterator<string> {
 export const log_if_verbose = (debug: Command['debug'], verbosity: number) =>
     (content: any, msg = 'Generated:\t', gt_level = 0): typeof content =>
         verbosity > gt_level && debug(`${msg} ${content}`) || content;
+
+export const downloadAndRef = (gen_dir: string, url: string): Promise<string> => new Promise((resolve, reject) => {
+        if (!url.startsWith('http')) return resolve(url);
+
+        const fname = url.slice(url.lastIndexOf('/') + 1);
+        const full_path = path.join(gen_dir, fname);
+
+        console.info('fname:', fname, ';');
+        console.info('full_path:', full_path, ';');
+
+        try {
+            if (existsSync(full_path)) // Sync variants, which aren't deprecated as opposed to `exists`
+                unlinkSync(full_path);
+        } catch (e) {
+            return reject(e);
+        }
+
+        (url.startsWith('https') ? https : http)
+            .get(url, res => {
+                const { statusCode } = res;
+                const contentType = res.headers['content-type'] as string;
+
+                let error: Error | undefined;
+                if (statusCode !== 200) {
+                    error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
+                } else if (!/^application\/json/.test(contentType)) {
+                    error = new Error('Invalid content-type.\n' +
+                        `Expected application/json but received ${contentType}`);
+                }
+                if (error) {
+                    // consume response data to free up memory
+                    res.resume();
+                    return reject(error);
+                }
+
+                const encoding = 'utf8';
+                res.setEncoding(encoding);
+                res.on('data', chunk => writeFileSync(full_path, chunk, { encoding, flag: 'a' }));
+                res.on('end', () => resolve(`./${fname}`));
+            })
+            .on('error', reject);
+    }
+);

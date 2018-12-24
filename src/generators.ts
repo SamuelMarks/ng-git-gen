@@ -27,6 +27,20 @@ ${componentHeader}
 export class ${className} {}
 `;
 
+export const component_gen_tpl_url_styles_url = (componentHeader: string, prefix: string, name: string,
+                                                 templateUrl: string, styleUrls: string[] | undefined,
+                                                 className: string): string =>
+    `import { Component } from '@angular/core';
+
+${componentHeader}
+@Component({
+  selector: ${ensure_quoted(prefix + '-' + name)},
+  templateUrl: ${ensure_quoted(templateUrl)},
+  styleUrls: [${styleUrls == null || !styleUrls.length ? '' : styleUrls.map(s => ensure_quoted(s)).join(', ')}]
+})
+export class ${className} {}
+`;
+
 const get_import_from_str = (extra_imports: string[]): string => extra_imports.length ?
     `,\n    ${extra_imports.map(l => l.slice(l.indexOf('{') + 1, l.lastIndexOf('}')).trim()).join(',')}` : '';
 
