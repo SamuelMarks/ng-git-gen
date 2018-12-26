@@ -11,8 +11,9 @@ import { OutputFlags } from '@oclif/parser';
 
 import * as async_ from 'async';
 
-import { component_gen, component_gen_tpl_url_styles_url, module_gen, routes_gen } from './generators';
+import { component_gen, component_gen_with_urls, module_gen, routes_gen } from './generators';
 import { camelCaseToDash, downloadAndRef, ensure_quoted, fnameSanitise, slugify, walkSync } from './utils';
+import NgGithubWikiGen = require('./index');
 
 git.plugins.set('fs', fs);
 
@@ -55,10 +56,9 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
             .catch(reject)
 );
 
-export const ngGitProcessor = (flags: OutputFlags<any>,
+export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
                                maybe_log: (content: any, msg?: string, level?: number) => typeof content,
-                               gen_dir: string, ng_prefix: string, output_ext: string,
-                               styleUrls: string[] | undefined) =>
+                               gen_dir: string, ng_prefix: string) =>
     (fname2content: Fname2Content): Promise<void> => new Promise((resolve, reject) => {
             const write_options: WriteFileOptions = { encoding: 'utf8', flag: 'w' };
 
@@ -80,13 +80,18 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                         const class_name = `${cname[0].toUpperCase() + cname.slice(1).replace(/-([a-z])/g,
                             (x, up) => up.toUpperCase())}`
                             + 'Component';
-                        const tpl_fname = `${cname}.component${output_ext}`;
+                        const tpl_fname = `${cname}.component${flags.output_ext}`;
                         const componentHeader = `// templateUrl: './${tpl_fname}'`;
 
+                        const lifecycles = new Map<string, string>(
+                            flags.lifecycle != null && flags.lifecycle.length ?
+                                flags.lifecycle.map((x: string, i: number) => [x, flags.lifecycle_init[i]]) as any
+                                : void 0);
+
                         writeFileSync(maybe_log(path.join(gen_dir, `${cname}.component.ts`)),
-                            component_gen_tpl_url_styles_url(componentHeader, ng_prefix, cname,
-                                `./${tpl_fname.replace(output_ext, '.html')}`,
-                                styleUrls, class_name),
+                            component_gen_with_urls(componentHeader, ng_prefix, cname,
+                                `./${tpl_fname.replace(flags.output_ext, '.html')}`,
+                                flags.styleUrls, /*flags.lifecycle*/lifecycles, class_name),
                             write_options);
 
                         /* tslint:disable:function-constructor */
@@ -153,11 +158,11 @@ export const ngGitProcessor = (flags: OutputFlags<any>,
                     .then(() => resolve())
                     .catch(reject))
                 .catch(reject);
-            if (styleUrls != null && styleUrls.length) {
-                async_.forEachOf(styleUrls, (_, i, callback) => {
-                    downloadAndRef(gen_dir, styleUrls[i as number])
+            if (flags.styleUrls != null && flags.styleUrls.length) {
+                async_.forEachOf(flags.styleUrls, (_, i, callback) => {
+                    downloadAndRef(gen_dir, flags.styleUrls[i as number])
                         .then(styleUrl => {
-                            styleUrls[i as number] = styleUrl;
+                            flags.styleUrls[i as number] = styleUrl;
                             return callback();
                         })
                         .catch(callback);

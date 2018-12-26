@@ -97,3 +97,6 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
             .on('error', reject);
     }
 );
+
+export const length_else_0 = (something: any): number =>
+    something == null ? 0 : (something.length ? something.length : 0);
