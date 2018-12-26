@@ -16,6 +16,9 @@ Originally for Github Wiki integration.
 
 ## Options
 
+    -R, --global_route                             [default: false] Lazy route in
+                                                 app-routing
+    
     -a, --afterstrap=afterstrap                    Execute this on the content
                                                  strings
     
@@ -46,12 +49,32 @@ Originally for Github Wiki integration.
     -l, --list_route                               [default: true] Generate root
                                                  route, listing all wiki links
     
+    -m, --global_route_mount=global_route_mount    [default: Value of route flag]
+                                                 If --global-route
+    
+    -o, --output_ext=output_ext                    [default: .html] Output
+                                                 extension
+    
     -p, --project_dir=project_dir                  (required) angular project dir
     
     -r, --route=route                              [default: wiki] Route, e.g.:
                                                  /wiki
     
+    -s, --styleUrls=styleUrls                      styleUrls, if starts with http,
+                                                 then will download to generated
+                                                 dir & update styleUrl to this
+    
     -v, --verbosity=verbosity                      verbosity
+    
+    --lifecycle=lifecycle                          Add lifecycle to
+                                                 component,e.g.: `--lifecycle
+                                                 AfterViewInit --lifecycle_init
+                                                 'console.info("AfterViewInit");
+                                                 throw Error("WOW")'
+    
+    --lifecycle_init=lifecycle_init                Add lifecycle init to
+                                                 component. See `--lifecycle`
+                                                 for example.
     
     --ng_project_name=ng_project_name              angular project name, defaults
                                                  to first in angular.json

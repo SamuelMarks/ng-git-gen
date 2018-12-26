@@ -60,6 +60,9 @@ class NgGithubWikiGen extends Command {
             char: 'l', description: '[default: true] Generate root route, listing all wiki links',
             default: true
         }),
+        download: flags.string({
+            multiple: true, description: 'Alternative to styleUrls syntax, places file in `generated` dir'
+        }),
         styleUrls: flags.string({
             char: 's', multiple: true,
             description: 'styleUrls, if starts with http, then will download to generated dir & update styleUrl to this'
@@ -91,7 +94,7 @@ class NgGithubWikiGen extends Command {
             flags.project_dir, angular_json['projects'][ng_project_name]['sourceRoot'],
             ng_prefix);
         const gen_parent = path.join(gen_grandparent, flags.route as string);
-        const gen = path.join(gen_parent, 'generated');
+        const gen_dir = path.join(gen_parent, 'generated');
 
         /* tslint:disable:no-bitwise */
         if (length_else_0(flags.lifecycle) + length_else_0(flags.lifecycle_init) as number & 1 === 1) {
@@ -105,14 +108,14 @@ class NgGithubWikiGen extends Command {
         maybe_log(flags.git_dir, 'Cloning to:\t');
 
         /* tslint:disable:no-unused-expression */
-        if (existsSync(maybe_log(gen, 'Removing:\t')))
-            readdirSync(gen)
-                .forEach(fname => unlinkSync(path.join(gen, fname))) as any || rmdirSync(gen);
+        if (existsSync(maybe_log(gen_dir, 'Removing:\t')))
+            readdirSync(gen_dir)
+                .forEach(fname => unlinkSync(path.join(gen_dir, fname))) as any || rmdirSync(gen_dir);
         else if (!existsSync(gen_parent)) mkdirSync(gen_parent);
-        mkdirSync(gen);
+        mkdirSync(gen_dir);
 
         acquireGitRepo(flags.ext as string, flags.git_url, flags.git_dir as string, flags.bootstrap)
-            .then(ngGitProcessor(flags, maybe_log, gen, ng_prefix))
+            .then(ngGitProcessor(flags, maybe_log, gen_dir, ng_prefix))
             .then(() => updateGlobalRoutes(gen_grandparent, flags.global_route,
                 flags.global_route_mount as any || flags.route))
             .catch((e: Error) => {

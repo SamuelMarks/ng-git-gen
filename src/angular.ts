@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as ts from 'typescript';
-import { ensure_quoted } from './utils';
+import { encoding, ensure_quoted } from './utils';
 
 export const updateGlobalRoutes = (gen_grandparent: string,
                                    global_routes: boolean,
@@ -17,7 +17,7 @@ export const updateGlobalRoutes = (gen_grandparent: string,
       `No route module (${valid_route_names.join(' or ')}) found in ${gen_grandparent}`
     ));
   const full_route_fname = path.join(gen_grandparent, route_fname);
-  const route_content = readFileSync(full_route_fname, { encoding: 'utf8' });
+  const route_content = readFileSync(full_route_fname, { encoding });
   // console.info(route_content);
   // Parse a file
   const _sourceFile = ts.createSourceFile(

@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
-import { WriteFileOptions, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 import * as path from 'path';
 
 import * as git from 'isomorphic-git';
@@ -10,9 +10,19 @@ import { Routes } from '@angular/router';
 import { OutputFlags } from '@oclif/parser';
 
 import * as async_ from 'async';
+import { ErrorCallback } from 'async';
 
 import { component_gen, component_gen_with_urls, module_gen, routes_gen } from './generators';
-import { camelCaseToDash, downloadAndRef, ensure_quoted, fnameSanitise, slugify, walkSync } from './utils';
+import {
+    camelCaseToDash,
+    default_write_opts,
+    downloadAndRef,
+    encoding,
+    ensure_quoted,
+    fnameSanitise,
+    slugify,
+    walkSync
+} from './utils';
 import NgGithubWikiGen = require('./index');
 
 git.plugins.set('fs', fs);
@@ -45,7 +55,7 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
                                 && fname.indexOf(`${path.sep}.github${path.sep}`) === -1
                                 && fname.indexOf(`${path.sep}.git${path.sep}`) === -1)
                                 fname2content.set(fname.replace(`${to_dir}${path.sep}`, ''),
-                                    fs.readFileSync(fname, { encoding: 'utf8' }));
+                                    fs.readFileSync(fname, { encoding }));
                     } catch (e) {
                         reject(e);
                     }
@@ -58,10 +68,8 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
 
 export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
                                maybe_log: (content: any, msg?: string, level?: number) => typeof content,
-                               gen_dir: string, ng_prefix: string) =>
-    (fname2content: Fname2Content): Promise<void> => new Promise((resolve, reject) => {
-            const write_options: WriteFileOptions = { encoding: 'utf8', flag: 'w' };
-
+                               gen_dir: string, ng_prefix: string) => (fname2content: Fname2Content): Promise<void> =>
+    new Promise((resolve, reject) => {
             if (!fname2content.size) {
                 maybe_log('Empty fname2content... will still generate' +
                     `${flags.list_route ? ' list Component and' : ''} Module`, '');
@@ -92,12 +100,12 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
                             component_gen_with_urls(componentHeader, ng_prefix, cname,
                                 `./${tpl_fname.replace(flags.output_ext, '.html')}`,
                                 flags.styleUrls, /*flags.lifecycle*/lifecycles, class_name),
-                            write_options);
+                            default_write_opts);
 
                         /* tslint:disable:function-constructor */
                         const processed_content = flags.postprocess_content == null ? content
                             : Function(`return \`${content}\`${flags.postprocess_content}`)();
-                        writeFileSync(maybe_log(path.join(gen_dir, tpl_fname)), processed_content, write_options);
+                        writeFileSync(maybe_log(path.join(gen_dir, tpl_fname)), processed_content, default_write_opts);
                         declarations.push(class_name);
 
                         routes.push({
@@ -128,7 +136,7 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
                 try {
                     writeFileSync(path.join(gen_dir, `${name}.component.ts`),
                         component_gen(ng_prefix, name, template, void 0, className),
-                        write_options);
+                        default_write_opts);
                     declarations.push(className);
 
                     routes.push({
@@ -143,33 +151,47 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
 
                     writeFileSync(maybe_log(path.join(gen_dir, 'generated.routes.ts')),
                         routes_gen(component_imports, routes, 'generatedRoutes'),
-                        write_options);
+                        default_write_opts);
                     writeFileSync(maybe_log(path.join(gen_dir, 'generated.module.ts')),
                         module_gen(component_imports, flags.extra_imports || [], declarations, 'GeneratedModule'),
-                        write_options);
+                        default_write_opts);
                     return res();
                 } catch (e) {
                     return rej(e);
                 }
             });
 
-            const fin = () => generateModuleAndComponents()
-                .then(() => generateListComponent()
-                    .then(() => resolve())
-                    .catch(reject))
-                .catch(reject);
-            if (flags.styleUrls != null && flags.styleUrls.length) {
-                async_.forEachOf(flags.styleUrls, (_, i, callback) => {
-                    downloadAndRef(gen_dir, flags.styleUrls[i as number])
-                        .then(styleUrl => {
-                            flags.styleUrls[i as number] = styleUrl;
-                            return callback();
-                        })
-                        .catch(callback);
-                }, error => {
-                    if (error == null) return fin();
-                    return reject(error);
+            const styleUrlsHandler = (cb: ErrorCallback<Error>) => flags.styleUrls != null && flags.styleUrls.length ?
+                async_.forEachOf(
+                    flags.styleUrls, (_, i, callback) => {
+                        downloadAndRef(gen_dir, flags.styleUrls[i as number])
+                            .then(styleUrl => {
+                                flags.styleUrls[i as number] = styleUrl;
+                                return callback();
+                            })
+                            .catch(callback);
+                    }, cb
+                )
+                : cb(void 0);
+
+            const downloadHandler = (cb: ErrorCallback<Error>) => flags.download != null && flags.download.length ?
+                async_.map(flags.download,
+                    (url, callb) =>
+                        downloadAndRef(gen_dir, url as string).then(() => callb()).catch(callb),
+                    e => cb(e)
+                )
+                : cb();
+
+            styleUrlsHandler(error => {
+                if (error != null) return reject(error);
+                downloadHandler(err => {
+                    if (err != null) return reject(err);
+                    generateModuleAndComponents()
+                        .then(() => generateListComponent()
+                            .then(() => resolve())
+                            .catch(reject))
+                        .catch(reject);
                 });
-            } else fin();
+            });
         }
     );

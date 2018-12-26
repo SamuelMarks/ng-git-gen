@@ -1,6 +1,6 @@
 import { Command } from '@oclif/command';
 
-import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, readdirSync, statSync, unlinkSync, WriteFileOptions, writeFileSync } from 'fs';
 import * as http from 'http';
 import { ClientRequestArgs } from 'http';
 import * as https from 'https';
@@ -60,13 +60,14 @@ export const log_if_verbose = (debug: Command['debug'], verbosity: number) =>
     (content: any, msg = 'Generated:\t', gt_level = 0): typeof content =>
         verbosity > gt_level && debug(`${msg} ${content}`) || content;
 
+export const encoding = 'utf8';
+export const default_write_opts: WriteFileOptions = { encoding, flag: 'w' };
+
 export const downloadAndRef = (gen_dir: string, url: string): Promise<string> => new Promise((resolve, reject) => {
         if (!url.startsWith('http')) return resolve(url);
 
         const fname = url.slice(url.lastIndexOf('/') + 1);
         const full_path = path.join(gen_dir, fname);
-
-        console.info('fname:', fname, ';\nfull_path:', full_path, ';\nurl:', url, ';');
 
         try {
             if (existsSync(full_path)) // Sync variants, which aren't deprecated as opposed to `exists`
@@ -76,9 +77,8 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
         }
 
         const options: ClientRequestArgs = parse(url);
-        options.headers = {
-            'User-Agent': 'request'
-        };
+        options.headers = { 'User-Agent': 'request' };
+
 
         (url.startsWith('https') ? https : http)
             .get(options, res => {
@@ -89,7 +89,7 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
                     return reject(new Error(`Request Failed.\nStatus Code: ${statusCode}`));
                 }
 
-                const encoding = 'utf8';
+
                 res.setEncoding(encoding);
                 res.on('data', chunk => writeFileSync(full_path, chunk, { encoding, flag: 'a' }));
                 res.on('end', () => resolve(`./${fname}`));
