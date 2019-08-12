@@ -8,3 +8,4 @@
 node_modules
 .idea
 test/ng-test
+tsconfig.tsbuildinfo

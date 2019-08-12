@@ -1,69 +1,71 @@
 {
   "name": "ng-git-gen",
+  "version": "0.0.15",
   "description": "Generates Angular (Module, Components and Routes) from static files in a git repo",
-  "version": "0.0.14",
-  "author": "Samuel Marks @SamuelMarks",
-  "bin": {
-    "ng-git-gen": "./bin/run"
-  },
+  "keywords": [
+    "angular",
+    "github",
+    "github-wiki",
+    "markdown",
+    "md",
+    "oclif",
+    "wiki"
+  ],
+  "homepage": "https://github.com/SamuelMarks/ng-git-gen",
   "bugs": "https://github.com/SamuelMarks/ng-git-gen/issues",
-  "dependencies": {
-    "@angular/common": "^7.1.4",
-    "@angular/core": "^7.1.4",
-    "@angular/platform-browser": "^7.1.4",
-    "@angular/router": "^7.1.4",
-    "@oclif/command": "^1.5.8",
-    "@oclif/config": "^1.10.2",
-    "@oclif/plugin-help": "^2.1.4",
-    "async": "^2.6.1",
-    "isomorphic-git": "^0.47.0",
-    "rxjs": "^6.3.3",
-    "tslib": "^1.9.3",
-    "zone.js": "^0.8.26"
-  },
-  "devDependencies": {
-    "@oclif/test": "^1.2.2",
-    "@oclif/tslint": "^3.1.1",
-    "@types/async": "^2.0.50",
-    "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.18",
-    "@types/rimraf": "^2.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "rimraf": "^2.6.2",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.12.0",
-    "typescript": "^3.2.2"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
+  "repository": "SamuelMarks/ng-git-gen",
+  "license": "MIT",
+  "author": "Samuel Marks @SamuelMarks",
   "files": [
     "/bin",
     "/lib"
   ],
-  "homepage": "https://github.com/SamuelMarks/ng-git-gen",
-  "keywords": [
-    "oclif",
-    "github",
-    "github-wiki",
-    "wiki",
-    "markdown",
-    "angular",
-    "md"
-  ],
-  "license": "MIT",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "ng-git-gen": "./bin/run"
+  },
+  "scripts": {
+    "prepack": "rm -rf lib && tsc -b",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+    "posttest": "tslint -p . -t stylish"
+  },
+  "dependencies": {
+    "@angular/common": "^8.2.1",
+    "@angular/core": "^8.2.1",
+    "@angular/platform-browser": "^8.2.1",
+    "@angular/router": "^8.2.1",
+    "@oclif/command": "^1.5.18",
+    "@oclif/config": "^1.13.2",
+    "@oclif/plugin-help": "^2.2.0",
+    "async": "^3.1.0",
+    "isomorphic-git": "^0.60.1",
+    "rxjs": "^6.5.2",
+    "tslib": "^1.10.0",
+    "zone.js": "^0.9.1"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^8.2.1",
+    "@oclif/test": "^1.2.5",
+    "@oclif/tslint": "^3.1.1",
+    "@types/async": "^3.0.1",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.1",
+    "@types/rimraf": "^2.0.2",
+    "chai": "^4.2.0",
+    "codelyzer": "^5.1.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "oclif": {
     "bin": "ng-git-gen"
-  },
-  "repository": "SamuelMarks/ng-git-gen",
-  "scripts": {
-    "posttest": "tslint -p . -t stylish",
-    "prepack": "rm -rf lib && tsc -b",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
-  },
-  "types": "lib/index.d.ts"
+  }
 }
