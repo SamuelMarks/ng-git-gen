@@ -1,16 +1,15 @@
-import { exec } from 'child_process';
-import * as fs from 'fs';
-import { writeFileSync } from 'fs';
-import * as path from 'path';
-
-import * as git from 'isomorphic-git';
-
 import { Type } from '@angular/core';
 import { Routes } from '@angular/router';
 import { OutputFlags } from '@oclif/parser';
 
 import * as async_ from 'async';
 import { ErrorCallback } from 'async';
+import { exec } from 'child_process';
+import * as fs from 'fs';
+import { writeFileSync } from 'fs';
+
+import * as git from 'isomorphic-git';
+import * as path from 'path';
 
 import { component_gen, component_gen_with_urls, module_gen, routes_gen } from './generators';
 import {
@@ -23,7 +22,7 @@ import {
     slugify,
     walkSync
 } from './utils';
-import NgGithubWikiGen = require('./index');
+import NgGitGen = require('./index');
 
 git.plugins.set('fs', fs);
 
@@ -66,7 +65,7 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
             .catch(reject)
 );
 
-export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
+export const ngGitProcessor = (flags: OutputFlags<typeof NgGitGen.flags>,
                                maybe_log: (content: any, msg?: string, level?: number) => typeof content,
                                gen_dir: string, ng_prefix: string) => (fname2content: Fname2Content): Promise<void> =>
     new Promise((resolve, reject) => {
@@ -77,7 +76,6 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGithubWikiGen.flags>,
             }
             const routes: Routes = [];
             const declarations: string[] = [];
-
 
             const generateModuleAndComponents = () => new Promise((res, rej) => {
                 try {

@@ -1,14 +1,18 @@
 ng-git-gen
 ==========
 
-Generates Angular (Module, Components and Routes) from static files in a git repo.
+Generates Angular (Module, Components and Routes) from static files in a git repo
 
-Originally for Github Wiki integration.
-
-[![NPM](https://nodei.co/npm/ng-git-gen.png)](https://nodei.co/npm/ng-git-gen/)
-
-<span class="badge-npmversion"><a href="https://npmjs.org/package/badges" title="View this project on NPM"><img src="https://img.shields.io/npm/v/badges.svg" alt="NPM version" /></a></span>
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
+[![Version](https://img.shields.io/npm/v/ng-git-gen.svg)](https://npmjs.org/package/ng-git-gen)
+[![Downloads/week](https://img.shields.io/npm/dw/ng-git-gen.svg)](https://npmjs.org/package/ng-git-gen)
+[![License](https://img.shields.io/npm/l/ng-git-gen.svg)](https://github.com/SamuelMarks/ng-git-gen/blob/master/package.json)
+
+<!-- toc -->
+# Usage
+<!-- usage -->
+# Commands
+<!-- commands -->
 
 ## Install
 

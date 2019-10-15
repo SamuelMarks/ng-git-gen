@@ -1,5 +1,4 @@
 import { Command } from '@oclif/command';
-
 import { existsSync, readdirSync, statSync, unlinkSync, WriteFileOptions, writeFileSync } from 'fs';
 import * as http from 'http';
 import { ClientRequestArgs } from 'http';
@@ -79,7 +78,6 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
         const options: ClientRequestArgs = parse(url);
         options.headers = { 'User-Agent': 'request' };
 
-
         (url.startsWith('https') ? https : http)
             .get(options, res => {
                 const { statusCode } = res;
@@ -88,7 +86,6 @@ export const downloadAndRef = (gen_dir: string, url: string): Promise<string> =>
                     res.resume();
                     return reject(new Error(`Request Failed.\nStatus Code: ${statusCode}`));
                 }
-
 
                 res.setEncoding(encoding);
                 res.on('data', chunk => writeFileSync(full_path, chunk, { encoding, flag: 'a' }));

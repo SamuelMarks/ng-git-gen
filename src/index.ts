@@ -1,16 +1,14 @@
 import { Command, flags } from '@oclif/command';
-
 import { existsSync, mkdirSync, readdirSync, rmdirSync, unlinkSync } from 'fs';
 import { tmpdir } from 'os';
 import * as path from 'path';
-import { ArgumentOutOfRangeError } from 'rxjs';
 
 import { updateGlobalRoutes } from './angular';
 import { acquireGitRepo, ngGitProcessor } from './git';
 import { length_else_0, log_if_verbose } from './utils';
 
-class NgGithubWikiGen extends Command {
-    static description = 'Generates Module, Components and Routes for Github Wiki integration with Angular.';
+class NgGitGen extends Command {
+    static description = 'Generates Angular (Module, Components and Routes) from static files in a git repo';
 
     static flags = {
         version: flags.version(),
@@ -79,9 +77,11 @@ class NgGithubWikiGen extends Command {
         })
     };
 
+    static args = [{ name: 'file' }];
+
     async run() {
         /* tslint:disable:no-shadowed-variable */
-        const { args, flags } = this.parse(NgGithubWikiGen);
+        const { args, flags } = this.parse(NgGitGen);
 
         const verbosity = flags.verbosity == null ? 0 : flags.verbosity.length;
         const maybe_log = log_if_verbose(this.log.bind(this), verbosity);
@@ -98,9 +98,7 @@ class NgGithubWikiGen extends Command {
 
         /* tslint:disable:no-bitwise */
         if (length_else_0(flags.lifecycle) + length_else_0(flags.lifecycle_init) as number & 1 === 1) {
-            const e = new ArgumentOutOfRangeError();
-            e.message = '`--lifecycle` and `--lifecycle-init` must be mentioned same number of times';
-            throw e;
+            throw new TypeError('`--lifecycle` and `--lifecycle-init` must be mentioned same number of times');
         }
 
         flags.git_dir = flags.git_dir || path.join(tmpdir(), flags.git_url.slice(flags.git_url.lastIndexOf('/') + 1));
@@ -124,4 +122,4 @@ class NgGithubWikiGen extends Command {
     }
 }
 
-export = NgGithubWikiGen;
+export = NgGitGen;
