@@ -42,7 +42,13 @@
   ],
   "homepage": "https://github.com/SamuelMarks/ng-git-gen",
   "keywords": [
-    "oclif"
+    "angular",
+    "github",
+    "github-wiki",
+    "markdown",
+    "md",
+    "oclif",
+    "wiki"
   ],
   "license": "(Apache-2.0 OR MIT)",
   "main": "lib/index.js",
