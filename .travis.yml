@@ -4,8 +4,10 @@ node_js:
 
 cache: npm
 
+before_script:
+ - npm i -g @angular/cli
+
 script:
   - ./bin/run --version
   - ./bin/run --help
   - npm run test
-
