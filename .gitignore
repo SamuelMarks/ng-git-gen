@@ -7,5 +7,3 @@
 /yarn.lock
 node_modules
 .idea
-test/ng-test
-*.tsbuildinfo

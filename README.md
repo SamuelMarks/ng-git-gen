@@ -9,10 +9,35 @@ Generates Angular (Module, Components and Routes) from static files in a git rep
 [![License](https://img.shields.io/npm/l/ng-git-gen.svg)](https://github.com/SamuelMarks/ng-git-gen/blob/master/package.json)
 
 <!-- toc -->
+
+* [Usage](#usage)
+* [Commands](#commands)
+
+<!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
+```sh-session
+$ npm install -g ng-git-gen
+$ ng-git-gen COMMAND
+running command...
+$ ng-git-gen (-v|--version|version)
+ng-git-gen/0.0.18 darwin-x64 node-v14.15.4
+$ ng-git-gen --help [COMMAND]
+USAGE
+  $ ng-git-gen COMMAND
+...
+```
+
+<!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
+
+<!-- commandsstop -->
 
 ## Install
 
