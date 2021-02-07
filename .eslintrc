@@ -2,5 +2,19 @@
   "extends": [
     "oclif",
     "oclif-typescript"
+  ],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "eqeqeq": "off",
+        "max-params": "off",
+        "new-cap": "off",
+        "no-console": "off",
+        "no-eq-null": "off",
+        "no-mixed-operators": "off",
+        "no-void": "off"
+      }
+    }
   ]
 }

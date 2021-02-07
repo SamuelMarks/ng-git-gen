@@ -7,11 +7,12 @@ import {encoding, ensure_quoted} from './utils'
 export const updateGlobalRoutes = (gen_grandparent: string,
   global_routes: boolean,
   global_route_mount: string) => new Promise((resolve, reject) => {
+  console.error('Ignored `global_route_mount`:', global_route_mount, ';')
   if (!global_routes) return resolve()
 
   const valid_route_names = ['app-routing.module.ts', 'app.routes.ts']
   const route_fname = readdirSync(gen_grandparent)
-    .find(fname => valid_route_names.indexOf(fname) > -1)
+  .find(fname => valid_route_names.indexOf(fname) > -1)
   if (route_fname == null)
     return reject(new ReferenceError(
       `No route module (${valid_route_names.join(' or ')}) found in ${gen_grandparent}`,
@@ -24,7 +25,7 @@ export const updateGlobalRoutes = (gen_grandparent: string,
     route_fname,
     route_content,
     ts.ScriptTarget.Latest,
-    /*setParentNodes */true,
+    /* setParentNodes */true,
   )
 
   // delint it
@@ -34,9 +35,9 @@ export const updateGlobalRoutes = (gen_grandparent: string,
   const sourceFile = ts.createSourceFile('file.ts', 'const a = { foo: "bar" };',
     ts.ScriptTarget.Latest, false)
 
-// get the object literal expression
+  // get the object literal expression
   const declaration = _sourceFile.statements.find(ts.isVariableStatement)!.declarationList.declarations
-    .find(t => ((t.type as any).typeName as ts.Identifier).escapedText === 'Routes')!
+  .find(t => ((t.type as any).typeName as ts.Identifier).escapedText === 'Routes')!
 
   const arrayLiteralExpression = declaration.initializer as ts.ArrayLiteralExpression
 
@@ -50,19 +51,19 @@ export const updateGlobalRoutes = (gen_grandparent: string,
       ts.createPropertyAssignment(
         'loadChildren', ts.createStringLiteral(ensure_quoted('myLoadChildren',
         ))),
-    ]),
-  ])
+    ])])
 
   const newNodeText = ts.createPrinter()
-    .printNode(ts.EmitHint.Unspecified, transformedArray, sourceFile)
+  .printNode(ts.EmitHint.Unspecified, transformedArray, sourceFile)
 
-// get the new source file text and reparse it to a new AST
+  // get the new source file text and reparse it to a new AST
   const oldText = sourceFile.text
-  const newText = oldText.substring(0, transformedArray.getStart(sourceFile, true))
-    + newNodeText + oldText.substring(transformedArray.end)
+  const newText = oldText.substring(0, transformedArray.getStart(sourceFile, true)) +
+    newNodeText + oldText.substring(transformedArray.end)
   const newSourceFile = ts.createSourceFile('file.ts', newText, ts.ScriptTarget.Latest, false)
+  console.info('Created:', newSourceFile.fileName, ';')
 
-// outputs: `const a = { foo: 'bar', can: 'haz' };`
+  // outputs: `const a = { foo: 'bar', can: 'haz' };`
   console.log(newText)
 })
 

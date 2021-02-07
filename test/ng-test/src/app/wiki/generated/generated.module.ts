@@ -13,5 +13,4 @@ import {generatedRoutes} from './generated.routes'
     CommonModule, RouterModule, RouterModule.forChild(generatedRoutes),
   ],
 })
-export class GeneratedModule {
-}
+export class GeneratedModule {}

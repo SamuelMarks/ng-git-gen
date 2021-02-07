@@ -6,7 +6,7 @@ import cmd = require('../src')
 
 const deleteFolderRecursive = (p: string) => {
   if (existsSync(p)) {
-    readdirSync(p).forEach((file) => {
+    readdirSync(p).forEach(file => {
       const curPath = path.join(p, file)
       if (lstatSync(curPath).isDirectory()) { // recurse
         deleteFolderRecursive(curPath)
@@ -52,7 +52,7 @@ describe('ng-git-gen', () => {
 
       if (!existsSync(route_dir))
         return cb(new assert.AssertionError({message: `'${route_dir}' not found`}))
-      else if (!existsSync(gen_dir))
+      if (!existsSync(gen_dir))
         return cb(new assert.AssertionError({message: `'${gen_dir}' not found`}))
 
       for (const fname of ['generated.module.ts', 'generated.routes.ts']) {
@@ -70,29 +70,31 @@ describe('ng-git-gen', () => {
     path.join(project_dir, 'src', 'app', route_name, 'list.component.ts')
 
   const base_cli_args = [
-    '--project_dir', project_dir,
-    '-g', 'https://github.com/Fantom-foundation/fantom-dev-web.wiki.git',
+    '--project_dir',
+    project_dir,
+    '-g',
+    'https://github.com/Fantom-foundation/fantom-dev-web.wiki.git',
   ]
 
   const test0 = '--project_dir -g'
   it(test0, done => {
     const route_name = 'wiki'
     cmd
-      .run(base_cli_args)
-      .then(() => {
-        confirmBaseModuleAndRoute(route_name, e => {
-          if (e != null) return done(e)
-          const wiki_list_component = list_component(route_name)
-          if (existsSync(wiki_list_component))
-            return done(new assert.AssertionError(
-              {message: `'${wiki_list_component}' should not exist`},
-            ))
-          return done()
-        })
+    .run(base_cli_args)
+    .then(() => {
+      confirmBaseModuleAndRoute(route_name, e => {
+        if (e != null) return done(e)
+        const wiki_list_component = list_component(route_name)
+        if (existsSync(wiki_list_component))
+          return done(new assert.AssertionError(
+            {message: `'${wiki_list_component}' should not exist`},
+          ))
+        return done()
       })
+    })
   })
 
-  /*const test1 = '--project_dir -g -l';
+  /* const test1 = '--project_dir -g -l';
   it(test1, () => {
     test
       .stdout()
@@ -118,5 +120,5 @@ describe('ng-git-gen', () => {
         if (!existsSync(wiki_list_component))
           throw new assert.AssertionError({ message: `'${wiki_list_component}' not found` });
       });
-  });*/
+  }); */
 })

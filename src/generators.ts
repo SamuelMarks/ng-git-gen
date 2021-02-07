@@ -12,7 +12,7 @@ export const component_gen = (prefix: string, name: string, template: string,
 @Component({
   selector: ${ensure_quoted(prefix + '-' + name)},
   template: ${ensure_quoted(template, '`')},
-  styles: [${styles == null || !styles.length ? '' : styles.map(s => ensure_quoted(s)).join(', ')}]
+  styles: [${styles == null || styles.length === 0 ? '' : styles.map(s => ensure_quoted(s)).join(', ')}]
 })
 export class ${className} {}
 `
@@ -21,32 +21,32 @@ export const component_gen_with_urls = (componentHeader: string, prefix: string,
   templateUrl: string, styleUrls: string[] | undefined,
   lifecycles: Map<string, string>,
   className: string): string => {
-  const keys = Array.from(lifecycles.keys())
+  const keys = [...lifecycles.keys()]
   const imports = lifecycles.size ? ', ' + keys.join(', ') : ''
   const body = (lifecycles.size ?
     `\n${default_component_attributes}` +
     keys
-      .map(k => `\n  ng${k}() {\n${
-        (lifecycles.get(k) as string)
-          .split('\n')
-          .map(s => `    ${s.trim()}\n`)
-          .join('\n')}`)
-      .join('\n') +
-    '  }\n'
-    : '')
+    .map(k => `\n  ng${k}() {\n${
+      (lifecycles.get(k) as string)
+      .split('\n')
+      .map(s => `    ${s.trim()}\n`)
+      .join('\n')}`)
+    .join('\n') +
+    '  }\n' :
+    '')
   return `import { Component${imports} } from '@angular/core';
 
 ${componentHeader}
 @Component({
   selector: ${ensure_quoted(prefix + '-' + name)},
   templateUrl: ${ensure_quoted(templateUrl)},
-  styleUrls: [${styleUrls == null || !styleUrls.length ? '' : styleUrls.map(s => ensure_quoted(s)).join(', ')}]
+  styleUrls: [${styleUrls == null || styleUrls.length === 0 ? '' : styleUrls.map(s => ensure_quoted(s)).join(', ')}]
 })
 export class ${className} ${lifecycles.size ? `implements${' ' + keys.join(', ') + ' '}` : ''}{${body}}
 `
 }
 
-const get_import_from_str = (extra_imports: string[]): string => extra_imports.length ?
+const get_import_from_str = (extra_imports: string[]): string => extra_imports.length > 0 ?
   `,\n    ${extra_imports.map(l => l.slice(l.indexOf('{') + 1, l.lastIndexOf('}')).trim()).join(',')}` : ''
 
 export const module_gen =

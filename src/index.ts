@@ -67,9 +67,9 @@ class NgGitGen extends Command {
     }),
     lifecycle: flags.string({
       multiple: true,
-      description: 'Add lifecycle to component,'
-        + 'e.g.: `--lifecycle AfterViewInit'
-        + ' --lifecycle_init \'console.info("AfterViewInit"); throw Error("WOW")\'',
+      description: 'Add lifecycle to component,' +
+        'e.g.: `--lifecycle AfterViewInit' +
+        ' --lifecycle_init \'console.info("AfterViewInit"); throw Error("WOW")\'',
     }),
     lifecycle_init: flags.string({
       multiple: true,
@@ -82,16 +82,17 @@ class NgGitGen extends Command {
   async run() {
     /* tslint:disable:no-shadowed-variable */
     const {args, flags} = this.parse(NgGitGen)
+    console.dir(args)
 
     const verbosity = flags.verbosity == null ? 0 : flags.verbosity.length
     const maybe_log = log_if_verbose(this.log.bind(this), verbosity)
 
     const angular_json = require(path.join(flags.project_dir, 'angular.json'))
-    const ng_project_name = flags.ng_project_name ? flags.ng_project_name
-      : Object.keys(angular_json['projects'])[0]
-    const ng_prefix = angular_json['projects'][ng_project_name]['prefix']
+    const ng_project_name = flags.ng_project_name ? flags.ng_project_name :
+      Object.keys(angular_json.projects)[0]
+    const ng_prefix = angular_json.projects[ng_project_name].prefix
     const gen_grandparent = path.join(
-      flags.project_dir, angular_json['projects'][ng_project_name]['sourceRoot'],
+      flags.project_dir, angular_json.projects[ng_project_name].sourceRoot,
       ng_prefix)
     const gen_parent = path.join(gen_grandparent, flags.route as string)
     const gen_dir = path.join(gen_parent, 'generated')
@@ -108,17 +109,17 @@ class NgGitGen extends Command {
     /* tslint:disable:no-unused-expression */
     if (existsSync(maybe_log(gen_dir, 'Removing:\t')))
       readdirSync(gen_dir)
-        .forEach(fname => unlinkSync(path.join(gen_dir, fname))) as any || rmdirSync(gen_dir)
+      .forEach(fname => unlinkSync(path.join(gen_dir, fname))) as any || rmdirSync(gen_dir)
     else if (!existsSync(gen_parent)) mkdirSync(gen_parent)
     mkdirSync(gen_dir)
 
     acquireGitRepo(flags.ext as string, flags.git_url, flags.git_dir as string, flags.bootstrap)
-      .then(ngGitProcessor(flags, maybe_log, gen_dir, ng_prefix))
-      .then(() => updateGlobalRoutes(gen_grandparent, flags.global_route,
+    .then(ngGitProcessor(flags, maybe_log, gen_dir, ng_prefix))
+    .then(() => updateGlobalRoutes(gen_grandparent, flags.global_route,
         flags.global_route_mount as any || flags.route))
-      .catch((e: Error) => {
-        throw e
-      })
+    .catch((error: Error) => {
+      throw error
+    })
   }
 }
 
