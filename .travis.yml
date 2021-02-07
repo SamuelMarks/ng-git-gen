@@ -5,6 +5,7 @@ node_js:
 cache: npm
 
 before_script:
+  - npm i -g npm@6
   - npm i -g @angular/cli
 
 script:
