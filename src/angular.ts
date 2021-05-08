@@ -8,7 +8,7 @@ export const updateGlobalRoutes = (gen_grandparent: string,
   global_routes: boolean,
   global_route_mount: string) => new Promise((resolve, reject) => {
   console.error('Ignored `global_route_mount`:', global_route_mount, ';')
-  if (!global_routes) return resolve()
+  if (!global_routes) return resolve(void 0);
 
   const valid_route_names = ['app-routing.module.ts', 'app.routes.ts']
   const route_fname = readdirSync(gen_grandparent)

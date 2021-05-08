@@ -1,7 +1,7 @@
 {
   "name": "ng-git-gen",
   "description": "Generates Angular (Module, Components and Routes) from static files in a git repo",
-  "version": "0.0.18",
+  "version": "0.0.18-alpha",
   "author": "Samuel Marks @SamuelMarks",
   "bin": {
     "ng-git-gen": "./bin/run"
@@ -12,30 +12,31 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "async": "^3.2.0",
-    "isomorphic-git": "^1.8.0",
-    "tslib": "^1.14.1"
+    "isomorphic-git": "^1.8.2",
+    "jasmine-spec-reporter": "^7.0.0",
+    "tslib": "^2.2.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.1101.4",
-    "@angular/common": "^11.1.2",
-    "@angular/core": "^11.1.2",
-    "@angular/platform-browser-dynamic": "^11.1.2",
-    "@angular/router": "^11.1.2",
+    "@angular-devkit/build-angular": "^0.1102.12",
+    "@angular/common": "^11.2.13",
+    "@angular/core": "^11.2.13",
+    "@angular/platform-browser-dynamic": "^11.2.13",
+    "@angular/router": "^11.2.13",
     "@oclif/dev-cli": "^1.26.0",
     "@oclif/test": "^1.2.8",
-    "@types/async": "^3.2.5",
-    "@types/chai": "^4.2.14",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^10.17.51",
-    "chai": "^4.3.0",
-    "eslint": "^5.16.0",
+    "@types/async": "^3.2.6",
+    "@types/chai": "^4.2.18",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.0.2",
+    "chai": "^4.3.4",
+    "eslint": "^7.26.0",
     "eslint-config-oclif": "^3.1.0",
-    "eslint-config-oclif-typescript": "^0.1.0",
-    "mocha": "^5.2.0",
-    "nyc": "^14.1.1",
-    "rxjs": "^6.6.3",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.7"
+    "eslint-config-oclif-typescript": "^0.2.0",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "rxjs": "^7.0.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "engines": {
     "node": ">=8.0.0"

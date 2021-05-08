@@ -41,10 +41,10 @@ export const acquireGitRepo = (ext: string, url: string, to_dir: string,
       depth: 10,
     })
     .then(() => new Promise((res, rej) =>
-      bootstrap == null || bootstrap.length === 0 ? res() :
+      bootstrap == null || bootstrap.length === 0 ? res(void 0) :
         exec(bootstrap as string, {cwd: to_dir}, (err, stdout, stderr) =>
           err == null ?
-            process.stdout.write(stdout) && process.stderr.write(stderr) && res() :
+            process.stdout.write(stdout) && process.stderr.write(stderr) && res(void 0) :
             rej(err)))
     .then(() => {
       const fname2content: Fname2Content = new Map()
@@ -111,7 +111,7 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGitGen.flags>,
             component: class_name as any as Type<any>,
           })
         }
-        res()
+        res(void 0)
       } catch (error) {
         /* tslint:disable:no-console */
         console.error(error.message, error.stack)
@@ -153,7 +153,7 @@ export const ngGitProcessor = (flags: OutputFlags<typeof NgGitGen.flags>,
         writeFileSync(maybe_log(path.join(gen_dir, 'generated.module.ts')),
           module_gen(component_imports, flags.extra_imports || [], declarations, 'GeneratedModule'),
           default_write_opts)
-        return res()
+        return res(void 0)
       } catch (error) {
         return rej(error)
       }
